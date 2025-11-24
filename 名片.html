@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分享我的電子名片</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0; }
+        .btn {
+            background-color: #06C755; color: white; padding: 15px 30px; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <button id="shareBtn" class="btn">發送名片給好友</button>
+
+    <script>
+        // 你的 LIFF ID (請去 LINE Developers 後台取得)
+        const MY_LIFF_ID = "2008560642-Vk3EQw2Y";
+
+        // 初始化 LIFF
+        liff.init({ liffId: MY_LIFF_ID })
+            .then(() => {
+                if (!liff.isLoggedIn()) {
+                    liff.login(); // 如果沒登入，強制登入
+                }
+            })
+            .catch((err) => {
+                console.error('LIFF 初始化失敗', err);
+            });
+
+        // 按鈕點擊事件
+        document.getElementById('shareBtn').addEventListener('click', function() {
+            if (liff.isApiAvailable('shareTargetPicker')) {
+                liff.shareTargetPicker([
+                    // 這裡放你的 Flex Message JSON (就是上一則回答的那一串)
+                    {
+                        "type": "flex",
+                        "altText": "這是一張電子名片",
+                        "contents": {
+                            "type": "carousel",
+                            "contents": [
+                                {
+                                    "type": "bubble",
+                                    "size": "mega",
+                                    "hero": {
+                                        "type": "image",
+                                        "url": "https://via.placeholder.com/500x300?text=MY+CARD",
+                                        "size": "full",
+                                        "aspectRatio": "20:13",
+                                        "aspectMode": "cover"
+                                    },
+                                    "body": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "我的電子名片",
+                                                "weight": "bold",
+                                                "size": "xl"
+                                            }
+                                        ]
+                                    },
+                                    "footer": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                            {
+                                                "type": "button",
+                                                "action": {
+                                                    "type": "uri",
+                                                    "label": "加我好友",
+                                                    "uri": "https://line.me/ti/p/你的ID"
+                                                },
+                                                "style": "primary"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ])
+                .then(function (res) {
+                    if (res) {
+                        alert("名片已發送成功！");
+                        liff.closeWindow(); // 發送後關閉視窗
+                    } else {
+                        console.log("使用者取消發送");
+                    }
+                })
+                .catch(function (error) {
+                    alert("發送失敗，請稍後再試");
+                    console.error(error);
+                });
+            } else {
+                alert("你的 LINE 版本不支援此功能");
+            }
+        });
+    </script>
+</body>
+</html>
